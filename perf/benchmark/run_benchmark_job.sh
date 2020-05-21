@@ -73,7 +73,7 @@ INSTALL_VERSION=$(curl "https://storage.googleapis.com/istio-build/dev/${BRANCH}
 echo "Setup istio release: ${INSTALL_VERSION}"
 
 pushd "${ROOT}/istio-install"
-   DEV_VERSION=${INSTALL_VERSION} ./setup_istio.sh -f istioctl_profiles/default.yaml
+   DEV_VERSION=${INSTALL_VERSION} ./setup_istio.sh -f istioctl_profiles/default-overlay.yaml
 popd
 
 # Step 3: setup Istio performance test
@@ -192,7 +192,7 @@ function collect_envoy_info() {
   POD_NAME=${2}
   FILE_SUFFIX=${3}
 
-  ENVOY_DUMP_NAME="${POD_NAME}_${CONFIG_NAME}_${FILE_SUFFIX}.yaml"
+  ENVOY_DUMP_NAME="${LOAD_GEN_TYPE}_${POD_NAME}_${CONFIG_NAME}_${FILE_SUFFIX}.yaml"
   kubectl exec -n "${NAMESPACE}" "${POD_NAME}" -c istio-proxy -- curl http://localhost:15000/"${FILE_SUFFIX}" > "${ENVOY_DUMP_NAME}"
   gsutil -q cp -r "${ENVOY_DUMP_NAME}" "gs://${GCS_BUCKET}/${OUTPUT_DIR}/${FILE_SUFFIX}/${ENVOY_DUMP_NAME}"
 }
@@ -230,7 +230,7 @@ for dir in "${CONFIG_DIR}"/*; do
        extra_overlay="-f ${dir}/installation.yaml"
     fi
     pushd "${ROOT}/istio-install"
-      DEV_VERSION=${INSTALL_VERSION} ./setup_istio.sh -f istioctl_profiles/default.yaml "${extra_overlay}"
+      DEV_VERSION=${INSTALL_VERSION} ./setup_istio.sh -f istioctl_profiles/default-overlay.yaml "${extra_overlay}"
     popd
 
     # Custom pre-run
