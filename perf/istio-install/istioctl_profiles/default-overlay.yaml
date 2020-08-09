@@ -60,7 +60,7 @@ spec:
           scaleTargetRef:
             apiVersion: apps/v1
             kind: Deployment
-            name: istio-pilot
+            name: istiod
         resources:
           limits:
             cpu: 5800m
@@ -95,20 +95,3 @@ spec:
       sds:
         token:
           aud: istio-ca
-    grafana:
-      datasources:
-        datasources.yaml:
-          apiVersion: 1
-          datasources:
-          - access: proxy
-            editable: true
-            isDefault: true
-            jsonData:
-              timeInterval: 5s
-            name: Prometheus
-            orgId: 1
-            type: prometheus
-            url: http://istio-prometheus.istio-prometheus:9090
-      enabled: true
-    tracing:
-      enabled: true
