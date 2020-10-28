@@ -22,11 +22,13 @@ go build
 
 ### Arguments
 
-* (optional) `--notes`  --  indicates where release notes should be found. Default: `./templates`
-* (optional) `--templates` -- indicates where templates should be found. Default: `./notes`
+* (optional) `--notes`  --  indicates where release notes should be found. Default: `./notes`. This argument can be repeated for additional repositories.
+* (optional) `--templates` -- indicates where templates should be found. Default: `./templates`
 * (optional) `--validateOnly` -- indicates to perform validation but not release notes generation.
 * `--oldBranch` -- indicates the branch (or tag) to compare against
 * `--newBranch` -- indicates the branch (or tag) containing new release notes
+* `--oldRelease` -- indicates the name of the release being upgrade from
+* `--newRelease` -- indicates the name of the new release.
 
 ## Templates
 
