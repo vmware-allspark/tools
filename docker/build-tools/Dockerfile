@@ -33,7 +33,6 @@ FROM ${GOLANG_IMAGE} as binary_tools_context
 ARG ISTIO_TOOLS_SHA
 
 # Pinned versions of stuff we pull in
-ENV FORTIO_VERSION=v1.3.1
 ENV GCR_AUTH_VERSION=1.5.0
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
@@ -52,7 +51,7 @@ ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
 ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV K8S_TEST_INFRA_VERSION=faa9dc11170504f4e6b9e44b922cc79c7677fca2
-ENV KIND_VERSION=v0.9.0
+ENV KIND_VERSION=v0.10.0
 ENV KUBECTL_VERSION=1.15.0
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.8.1
 ENV PROTOC_GEN_SWAGGER_VERSION=v1.8.1
@@ -122,7 +121,6 @@ RUN go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@${PROTO
 RUN go install github.com/jstemmer/go-junit-report@${GO_JUNIT_REPORT_VERSION}
 RUN go install sigs.k8s.io/kind@${KIND_VERSION}
 RUN go install github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
-RUN go install github.com/fortio/fortio@${FORTIO_VERSION}
 RUN go install github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
 RUN go install golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
 
