@@ -18,7 +18,7 @@ Flame graphs are created from data collected using linux `perf_events` by the `p
    Since `istio-proxy` container does not allow installation of new packages, build a new docker image.
 
     ```plain
-    FROM gcr.io/istio-release/proxyv2:release-1.0-20180810-09-15
+    FROM docker.io/istio/proxyv2:1.11.4
     # Install fpm tool
     RUN  sudo apt-get update && \
         sudo apt-get -qqy install linux-tools-generic
@@ -27,7 +27,7 @@ Flame graphs are created from data collected using linux `perf_events` by the `p
     Build image and push docker image and use it in your deployment by adding the following annotation.
 
     ```plain
-    "sidecar.istio.io/proxyImag" : <name of your image>
+    "sidecar.istio.io/proxyImage" : <name of your image>
     ```
 
     This step will go away once the default debug image contains `perf` and related tools.
