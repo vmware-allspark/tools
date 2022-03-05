@@ -45,6 +45,7 @@ ENV GOIMPORTS_VERSION=v0.1.0
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV GH_VERSION=2.0.0
 ENV GOLANG_PROTOBUF_VERSION=v1.27.1
+ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
 # When updating the golangci version, you may want to update the common-files config/.golangci* files as well.
 ENV GOLANGCI_LINT_VERSION=v1.44.0
 ENV HADOLINT_VERSION=v2.8.0
@@ -118,6 +119,7 @@ RUN mv /usr/bin/gh ${OUTDIR}/usr/bin
 
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
+RUN go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION}
 RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION}
 RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION}
 RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION}
@@ -753,7 +755,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     ca-certificates \
     gcc \
-    git \
     ssh \
     libltdl7 \
     libc-dev \
@@ -765,6 +766,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     jq \
     tshark
+
+# Build git from source. Golang now requires a recent git version
+# hadolint ignore=DL3003,DL3009,DL4001
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    libcurl4-gnutls-dev \
+    libexpat1-dev \
+    gettext \
+    unzip && \
+    wget -q https://github.com/git/git/archive/v2.25.1.zip -O git.zip && \
+    unzip git.zip && \
+    cd git-* && \
+    make prefix=/usr/local all && \
+    make prefix=/usr/local install && \
+    cd .. && rm -r git-*
 
 # Docker including docker-ce, docker-ce-cli, and containerd.io
 ADD https://download.docker.com/linux/ubuntu/gpg /tmp/docker-key
@@ -784,6 +801,7 @@ RUN chmod +x /usr/local/bin/entrypoint
 # CMake
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # ubuntu 18.04 without arm64 version see https://apt.kitware.com/
+# hadolint ignore=DL4001
 RUN set -eux; \
     \
     case $(uname -m) in \
