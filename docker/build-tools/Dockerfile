@@ -40,7 +40,6 @@ ENV GCR_AUTH_VERSION=2.0.4
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
-ENV GOGO_PROTOBUF_VERSION=v1.3.2
 ENV GOIMPORTS_VERSION=v0.1.0
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV GH_VERSION=2.5.2
@@ -120,10 +119,6 @@ RUN mv /usr/bin/gh ${OUTDIR}/usr/bin
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
 RUN go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION}
 RUN go install -ldflags="-s -w" github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION}
 RUN go install -ldflags="-s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION}
 RUN go install -ldflags="-s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION}
@@ -148,9 +143,7 @@ RUN go install -ldflags="-s -w" istio.io/tools/cmd/annotations_prep@${ISTIO_TOOL
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA}
-RUN go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-deepcopy@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA}
-RUN go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-jsonshim@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA}
@@ -364,7 +357,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Pinned versions of stuff we pull in
 ENV AWESOMEBOT_VERSION=1.20.0
-ENV FPM_VERSION=1.12.0
+# Sometime between 1.14.1 and 1.14.2 to pull in some fixes for deb
+ENV FPM_VERSION=eb5370d16e361db3f1425f8c898bafe7f3c66869
 ENV HTMLPROOFER_VERSION=3.19.0
 ENV LICENSEE_VERSION=9.15.1
 ENV MDL_VERSION=0.11.0
@@ -379,7 +373,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     cmake \
     pkg-config \
-    libssl-dev
+    libssl-dev \
+    git
 
 # RUN add-apt-repository -y ppa:brightbox/ruby-ng-experimental
 # TODO revert when arm64 version ready https://groups.google.com/g/brightbox-ruby-ubuntu-packaging/c/8JLWIsW_DWc
@@ -394,7 +389,11 @@ RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
 RUN gem install --no-wrappers --no-document html-proofer -v ${HTMLPROOFER_VERSION}
 RUN gem install --no-wrappers --no-document awesome_bot -v ${AWESOMEBOT_VERSION}
 RUN gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION}
-RUN gem install --no-wrappers --no-document fpm -v ${FPM_VERSION}
+# hadolint ignore=DL3003,DL3028
+RUN git clone https://github.com/jordansissel/fpm && \
+    cd fpm && \
+    git reset --hard ${FPM_VERSION} && \
+    make install
 
 ##############
 # Python
