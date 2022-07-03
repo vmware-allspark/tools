@@ -31,7 +31,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 # support other container tools, e.g. podman
 CONTAINER_CLI=${CONTAINER_CLI:-docker}
 # Use buildx for CI by default, allow overriding for old clients or other tools like podman
-CONTAINER_BUILDER=${CONTAINER_BUILDER:-"buildx build"}
+CONTAINER_BUILDER=${CONTAINER_BUILDER:-"buildx build --load"}
 HUB=${HUB:-gcr.io/istio-testing}
 # Suffix is derive from the Git SHA we are building for consistency.
 # If there is none define, we fallback to date. Note this doesn't work with MANIFEST_ARCH
@@ -47,7 +47,7 @@ ARCH="${TARGET_ARCH:-amd64}"
 # MANIFEST_ARCH, if present, defines which architectures we should join together once complete.
 # For example, if we have MANIFEST_ARCH="amd64 arm64", after the build is complete we will merge the amd64 and arm64 images
 # Generally, this should always be set even with a single architecture build or we will end up with only an image with a `-{arch}` suffix.
-MANIFEST_ARCH="${MANIFEST_ARCH:-amd64}"
+MANIFEST_ARCH="${MANIFEST_ARCH-amd64}"
 
 # The docker image runs `go get istio.io/tools@${SHA}`
 # In postsubmit, if we pull from the head of the branch, we get a race condition and usually will pull and old version
@@ -67,22 +67,30 @@ fi
 # shellcheck disable=SC2086
 ${CONTAINER_CLI} ${CONTAINER_BUILDER} --target build_tools \
   ${ADDITIONAL_BUILD_ARGS} --build-arg "ISTIO_TOOLS_SHA=${SHA}" --build-arg "VERSION=${VERSION}" \
-  -t "${HUB}/build-tools:${VERSION}-${ARCH}" \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --cache-from "${HUB}/build-tools:${BRANCH}-latest-${ARCH}" \
   -t "${HUB}/build-tools:${BRANCH}-latest-${ARCH}" \
+  -t "${HUB}/build-tools:${VERSION}-${ARCH}" \
   .
+
 # shellcheck disable=SC2086
 ${CONTAINER_CLI} ${CONTAINER_BUILDER} --target build_env_proxy \
   ${ADDITIONAL_BUILD_ARGS} --build-arg "ISTIO_TOOLS_SHA=${SHA}" --build-arg "VERSION=${VERSION}" \
-  -t "${HUB}/build-tools-proxy:${VERSION}-${ARCH}" \
+  --build-arg BUILDKIT_INLINE_CACHE=1 \
+  --cache-from "${HUB}/build-tools-proxy:${BRANCH}-latest-${ARCH}" \
   -t "${HUB}/build-tools-proxy:${BRANCH}-latest-${ARCH}" \
+  -t "${HUB}/build-tools-proxy:${VERSION}-${ARCH}" \
   .
+
 if [[ "$(uname -m)" == "x86_64" ]]; then
   # Multi arch is not supported for CentOS, since its legacy and multi-arch is new.
   # shellcheck disable=SC2086
   ${CONTAINER_CLI} ${CONTAINER_BUILDER} \
     ${ADDITIONAL_BUILD_ARGS} --build-arg "ISTIO_TOOLS_SHA=${SHA}" --build-arg "VERSION=${VERSION}" \
-    -t "${HUB}/build-tools-centos:${VERSION}" \
+    --build-arg BUILDKIT_INLINE_CACHE=1 \
+    --cache-from "${HUB}/build-tools-centos:${BRANCH}-latest" \
     -t "${HUB}/build-tools-centos:${BRANCH}-latest" \
+    -t "${HUB}/build-tools-centos:${VERSION}" \
     -f Dockerfile.centos \
     .
 fi
