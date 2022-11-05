@@ -42,14 +42,14 @@ ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.1.0
 ENV BENCHSTAT_VERSION=9c9101da8316
-ENV GH_VERSION=2.18.1
+ENV GH_VERSION=2.19.0
 ENV GOLANG_PROTOBUF_VERSION=v1.28.1
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
 # When updating the golangci version, you may want to update the common-files config/.golangci* files as well.
 ENV GOLANGCI_LINT_VERSION=v1.50.1
 ENV HADOLINT_VERSION=v2.10.0
 ENV HELM3_VERSION=v3.10.1
-ENV HUGO_VERSION=0.104.3
+ENV HUGO_VERSION=0.105.0
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -65,8 +65,8 @@ ENV PROTOLOCK_VERSION=v0.14.0
 ENV PROTOTOOL_VERSION=v1.10.0
 ENV SHELLCHECK_VERSION=v0.8.0
 ENV SU_EXEC_VERSION=0.2
-ENV UPX_VERSION=3.96
-ENV YQ_VERSION=4.28.2
+ENV UPX_VERSION=4.0.0
+ENV YQ_VERSION=4.29.2
 ENV KPT_VERSION=v0.39.3
 ENV BUF_VERSION=v1.9.0
 ENV GCLOUD_VERSION=405.0.1
@@ -290,13 +290,13 @@ RUN set -eux; \
     rm "/tmp/${TRVIY_DEB_NAME}"; \
     mv /usr/local/bin/trivy ${OUTDIR}/usr/bin/
 
-
 # Compress the Go tools and put them in their final location
+# Don't run upx against helm - Add a grep -v
 ADD https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${TARGETARCH}_linux.tar.xz /tmp
 RUN tar -xJf /tmp/upx-${UPX_VERSION}-${TARGETARCH}_linux.tar.xz -C /tmp
 RUN mv /tmp/upx-${UPX_VERSION}-${TARGETARCH}_linux/upx /usr/bin
 RUN mv /tmp/go/bin/* ${OUTDIR}/usr/bin
-RUN find ${OUTDIR}/usr/bin/ -maxdepth 1 -type f  -writable | grep -v su-exec | xargs upx --lzma || true
+RUN find ${OUTDIR}/usr/bin/ -maxdepth 1 -type f -writable | grep -v su-exec | grep -v helm | xargs upx --lzma || true
 
 # Cleanup stuff we don't need in the final image
 RUN rm -fr /usr/local/go/doc
@@ -409,7 +409,7 @@ RUN gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION}
 # hadolint ignore=DL3003,DL3028
 RUN mkdir fpm && \
     cd fpm && \
-    git init && \ 
+    git init && \
     git remote add origin https://github.com/jordansissel/fpm && \
     git fetch --depth 1 origin ${FPM_VERSION} && \
     git checkout FETCH_HEAD && \
