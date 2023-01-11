@@ -458,7 +458,7 @@ FROM ubuntu:jammy as base_os_context
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV DOCKER_VERSION=5:20.10.22~3-0~ubuntu-jammy
-ENV CONTAINERD_VERSION=1.6.14-1
+ENV CONTAINERD_VERSION=1.6.15-1
 ENV RUST_VERSION=1.66.0
 
 ENV OUTDIR=/out
@@ -494,7 +494,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext-base \
     locales-all \
     file \
-    libclang-dev
+    libclang-dev \
+    iproute2 \
+    ipset
 
 # Fix Docker issue
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
