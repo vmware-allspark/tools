@@ -68,7 +68,7 @@ ENV SU_EXEC_VERSION=0.2
 ENV YQ_VERSION=4.30.6
 ENV KPT_VERSION=v0.39.3
 ENV BUF_VERSION=v1.11.0
-ENV GCLOUD_VERSION=410.0.0
+ENV GCLOUD_VERSION=413.0.0
 ENV KUBETEST2_VERSION=b019714a389563c9a788f119f801520d059b6533
 ENV COSIGN_VERSION=v1.13.1
 ENV CRANE_VERSION=v0.12.1
@@ -496,7 +496,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     file \
     libclang-dev \
     iproute2 \
-    ipset
+    ipset \
+    rsync
 
 # Fix Docker issue
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
