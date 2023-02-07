@@ -377,7 +377,7 @@ ENV AWESOMEBOT_VERSION=1.20.0
 ENV FPM_VERSION=eb5370d16e361db3f1425f8c898bafe7f3c66869
 ENV HTMLPROOFER_VERSION=3.19.0
 ENV LICENSEE_VERSION=9.15.1
-ENV MDL_VERSION=0.11.0
+ENV MDL_VERSION=0.12.0
 
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -428,6 +428,7 @@ ENV REQUESTS_VERSION=2.22.0
 ENV PYTHON_PROTOBUF_VERSION=3.11.2
 ENV PYYAML_VERSION=5.3.1
 ENV JWCRYPTO_VERSION=0.7
+ENV PYGITHUB_VERSION=1.57
 
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -448,6 +449,7 @@ RUN python3 -m pip install --no-cache-dir requests==${REQUESTS_VERSION}
 RUN python3 -m pip install --no-cache-dir protobuf==${PYTHON_PROTOBUF_VERSION}
 RUN python3 -m pip install --no-cache-dir PyYAML==${PYYAML_VERSION}
 RUN python3 -m pip install --no-cache-dir jwcrypto==${JWCRYPTO_VERSION}
+RUN python3 -m pip install --no-cache-dir PyGithub==${PYGITHUB_VERSION}
 
 #############
 # Base OS
