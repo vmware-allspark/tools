@@ -25,7 +25,7 @@
 ################
 # Binary tools
 ################
-ARG GOLANG_IMAGE=golang:1.20.2
+ARG GOLANG_IMAGE=golang:1.20.3
 # hadolint ignore=DL3006
 FROM ${GOLANG_IMAGE} as binary_tools_context
 # TARGETARCH is an automatic platform ARG enabled by Docker BuildKit.
@@ -35,27 +35,27 @@ ARG TARGETARCH
 ARG ISTIO_TOOLS_SHA
 
 # Pinned versions of stuff we pull in
-ENV BOM_VERSION=v0.4.1
+ENV BOM_VERSION=v0.5.1
 ENV GCR_AUTH_VERSION=2.1.6
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.1.0
 ENV BENCHSTAT_VERSION=9c9101da8316
-ENV GH_VERSION=2.24.3
+ENV GH_VERSION=2.27.0
 ENV GOLANG_PROTOBUF_VERSION=v1.30.0
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
 # When updating the golangci version, you may want to update the common-files config/.golangci* files as well.
 ENV GOLANGCI_LINT_VERSION=v1.51.2
 ENV HADOLINT_VERSION=v2.12.0
 ENV HELM3_VERSION=v3.11.2
-ENV HUGO_VERSION=0.111.2
+ENV HUGO_VERSION=0.111.3
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
-ENV K8S_CODE_GENERATOR_VERSION=1.26.0
+ENV K8S_CODE_GENERATOR_VERSION=1.27.0
 ENV K8S_TEST_INFRA_VERSION=2acdc6800510dd422bfd2a5d8c02aedc19d15f8d
-ENV KIND_VERSION=v0.17.0
+ENV KIND_VERSION=v0.18.0
 ENV KUBECTL_VERSION=1.26.3
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.8.6
 ENV PROTOC_GEN_SWAGGER_VERSION=v1.8.6
@@ -65,14 +65,15 @@ ENV PROTOLOCK_VERSION=v0.14.0
 ENV PROTOTOOL_VERSION=v1.10.0
 ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.2
-ENV YQ_VERSION=4.32.2
+ENV YQ_VERSION=4.33.2
 ENV KPT_VERSION=v0.39.3
 ENV BUF_VERSION=v1.13.1
-ENV GCLOUD_VERSION=422.0.0
+ENV GCLOUD_VERSION=425.0.0
 ENV KUBETEST2_VERSION=b019714a389563c9a788f119f801520d059b6533
-ENV COSIGN_VERSION=v2.0.0
+ENV COSIGN_VERSION=v2.0.1
 ENV CRANE_VERSION=v0.14.0
-ENV TRIVY_VERSION=0.38.3
+ENV TRIVY_VERSION=0.39.1
+ENV KUBECTX_VERSION=0.9.4
 
 ENV GO111MODULE=on
 ENV GOPROXY=https://proxy.golang.org
@@ -291,6 +292,14 @@ RUN set -eux; \
     rm "/tmp/${TRVIY_DEB_NAME}"; \
     mv /usr/local/bin/trivy ${OUTDIR}/usr/bin/
 
+# Install kubectx and kubens
+ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubectx /tmp
+RUN mv /tmp/kubectx ${OUTDIR}/usr/bin/kubectx
+RUN chmod 555 ${OUTDIR}/usr/bin/kubectx
+ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubens /tmp
+RUN mv /tmp/kubens ${OUTDIR}/usr/bin/kubens
+RUN chmod 555 ${OUTDIR}/usr/bin/kubens
+
 # Move Go tools to their final location
 RUN mv /tmp/go/bin/* ${OUTDIR}/usr/bin
 
@@ -460,8 +469,8 @@ FROM ubuntu:jammy as base_os_context
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV DOCKER_VERSION=5:20.10.23~3-0~ubuntu-jammy
-ENV CONTAINERD_VERSION=1.6.18-1
-ENV RUST_VERSION=1.68.0
+ENV CONTAINERD_VERSION=1.6.20-1
+ENV RUST_VERSION=1.68.2
 
 ENV OUTDIR=/out
 
@@ -505,7 +514,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsync \
     clang \
     llvm \
-    libbpf-dev
+    libbpf-dev \
+    net-tools \
+    ninja-build \
+    sudo
 
 # Fix Docker issue
 RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
