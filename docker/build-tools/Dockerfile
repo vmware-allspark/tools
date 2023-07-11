@@ -40,7 +40,7 @@ ENV BOM_VERSION=v0.5.1
 ENV BUF_VERSION=v1.23.1
 ENV COSIGN_VERSION=v2.1.1
 ENV CRANE_VERSION=v0.15.2
-ENV GCLOUD_VERSION=436.0.0
+ENV GCLOUD_VERSION=437.0.1
 ENV GCR_AUTH_VERSION=2.1.6
 ENV GH_VERSION=2.31.0
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
@@ -53,7 +53,7 @@ ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV HADOLINT_VERSION=v2.12.0
 ENV HELM3_VERSION=v3.12.1
-ENV HUGO_VERSION=0.115.1
+ENV HUGO_VERSION=0.115.2
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -67,11 +67,11 @@ ENV KUBECTX_VERSION=0.9.4
 ENV KUBETEST2_VERSION=b019714a389563c9a788f119f801520d059b6533
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.16.0
 ENV PROTOC_GEN_VALIDATE_VERSION=1.0.1
-ENV PROTOC_VERSION=23.3
+ENV PROTOC_VERSION=23.4
 ENV PROTOLOCK_VERSION=v0.16.0
 ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.3.1
-ENV TRIVY_VERSION=0.43.0
+ENV TRIVY_VERSION=0.43.1
 ENV YQ_VERSION=4.34.1
 
 ENV GO111MODULE=on
@@ -250,8 +250,12 @@ RUN wget -nv -O "${OUTDIR}/usr/bin/buf" "https://github.com/bufbuild/buf/release
     chmod 555 "${OUTDIR}/usr/bin/buf"
 
 # Install su-exec which is a tool that operates like sudo without the overhead
-RUN wget -nv -O "${OUTDIR}/usr/bin/su-exec" https://github.com/NobodyXu/su-exec/releases/download/v${SU_EXEC_VERSION}/su-exec-musl-static && \
-    chmod 555 "${OUTDIR}/usr/bin/su-exec"
+ADD https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz /tmp
+RUN tar -xzvf v${SU_EXEC_VERSION}.tar.gz
+WORKDIR /tmp/su-exec-${SU_EXEC_VERSION}
+# Setting LDFLAGS is needed here, upstream uses '--icf=all' which our linker  doesn't have
+RUN LDFLAGS="-fvisibility=hidden -Wl,-O2 -Wl,--discard-all -Wl,--strip-all -Wl,--as-needed -Wl,--gc-sections" make
+RUN cp -a su-exec ${OUTDIR}/usr/bin
 
 ADD https://github.com/GoogleContainerTools/kpt/releases/download/${KPT_VERSION}/kpt_linux_${TARGETARCH} ${OUTDIR}/usr/bin/kpt
 RUN chmod 555 ${OUTDIR}/usr/bin/kpt
@@ -479,9 +483,9 @@ FROM ubuntu:jammy as base_os_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV DOCKER_VERSION=5:24.0.2-1~ubuntu.22.04~jammy
+ENV DOCKER_VERSION=5:24.0.4-1~ubuntu.22.04~jammy
 ENV CONTAINERD_VERSION=1.6.21-1
-ENV DOCKER_BUILDX_VERSION=0.10.5-1~ubuntu.22.04~jammy
+ENV DOCKER_BUILDX_VERSION=0.11.1-1~ubuntu.22.04~jammy
 ENV RUST_VERSION=1.70.0
 
 ENV OUTDIR=/out
