@@ -37,12 +37,12 @@ ARG ISTIO_TOOLS_SHA
 # Pinned versions of stuff we pull in
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV BOM_VERSION=v0.5.1
-ENV BUF_VERSION=v1.23.1
+ENV BUF_VERSION=v1.24.0
 ENV COSIGN_VERSION=v2.1.1
 ENV CRANE_VERSION=v0.15.2
 ENV GCLOUD_VERSION=437.0.1
 ENV GCR_AUTH_VERSION=2.1.6
-ENV GH_VERSION=2.31.0
+ENV GH_VERSION=2.32.0
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.9.1
 # When updating the golangci version, you may want to update the common-files config/.golangci* files as well.
@@ -52,8 +52,8 @@ ENV GOLANG_PROTOBUF_VERSION=v1.31.0
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV HADOLINT_VERSION=v2.12.0
-ENV HELM3_VERSION=v3.12.1
-ENV HUGO_VERSION=0.115.2
+ENV HELM3_VERSION=v3.12.2
+ENV HUGO_VERSION=0.115.3
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -65,6 +65,8 @@ ENV KPT_VERSION=v1.0.0-beta.35
 ENV KUBECTL_VERSION=1.27.3
 ENV KUBECTX_VERSION=0.9.4
 ENV KUBETEST2_VERSION=b019714a389563c9a788f119f801520d059b6533
+# TODO: switch to v0.4.0 when its out; we depend on some bug fixes since v0.3.0
+ENV OTEL_CLI_VERSION=159cd1ec2e3f992e5f963dc70269b068c1038738
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.16.0
 ENV PROTOC_GEN_VALIDATE_VERSION=1.0.1
 ENV PROTOC_VERSION=23.4
@@ -72,7 +74,7 @@ ENV PROTOLOCK_VERSION=v0.16.0
 ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.3.1
 ENV TRIVY_VERSION=0.43.1
-ENV YQ_VERSION=4.34.1
+ENV YQ_VERSION=4.34.2
 
 ENV GO111MODULE=on
 ENV GOPROXY=https://proxy.golang.org
@@ -148,6 +150,7 @@ RUN go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION
 RUN go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
 RUN go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
 RUN go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION}
+RUN go install -ldflags="-s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERSION}
 # Install latest version of Istio-owned tools in this release
 RUN go install -ldflags="-s -w" \
   istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} \
@@ -486,7 +489,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER_VERSION=5:24.0.4-1~ubuntu.22.04~jammy
 ENV CONTAINERD_VERSION=1.6.21-1
 ENV DOCKER_BUILDX_VERSION=0.11.1-1~ubuntu.22.04~jammy
-ENV RUST_VERSION=1.70.0
+ENV RUST_VERSION=1.71.0
 
 ENV OUTDIR=/out
 
