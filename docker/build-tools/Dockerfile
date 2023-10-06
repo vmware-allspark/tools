@@ -25,7 +25,7 @@
 ################
 # Binary tools
 ################
-ARG GOLANG_IMAGE=golang:1.21.1-bullseye
+ARG GOLANG_IMAGE=golang:1.21.2-bullseye
 # hadolint ignore=DL3006
 FROM ${GOLANG_IMAGE} as binary_tools_context
 # TARGETARCH is an automatic platform ARG enabled by Docker BuildKit.
@@ -163,7 +163,8 @@ RUN go install -ldflags="-s -w" \
   istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} \
-  istio.io/tools/cmd/org-gen@${ISTIO_TOOLS_SHA}
+  istio.io/tools/cmd/org-gen@${ISTIO_TOOLS_SHA} \
+  istio.io/tools/cmd/protoc-gen-crd@${ISTIO_TOOLS_SHA}
 RUN go install -ldflags="-s -w" \
   k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
   k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
