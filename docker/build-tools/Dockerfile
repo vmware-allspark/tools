@@ -53,7 +53,7 @@ ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV HADOLINT_VERSION=v2.12.0
 ENV HELM3_VERSION=v3.13.1
-ENV HUGO_VERSION=0.120.4
+ENV HUGO_VERSION=0.119.0
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.15.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -156,7 +156,6 @@ RUN go install -ldflags="-s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERS
 RUN go install -ldflags="-s -w" \
   istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} \
-  istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} \
