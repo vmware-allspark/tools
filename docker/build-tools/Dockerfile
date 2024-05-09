@@ -25,7 +25,7 @@
 ################
 # Binary tools
 ################
-ARG GOLANG_IMAGE=golang:1.22.2-bullseye
+ARG GOLANG_IMAGE=golang:1.22.2
 # hadolint ignore=DL3006
 FROM ${GOLANG_IMAGE} as binary_tools_context
 # TARGETARCH is an automatic platform ARG enabled by Docker BuildKit.
@@ -41,7 +41,7 @@ ENV BOM_VERSION=v0.6.0
 ENV BUF_VERSION=v1.31.0
 ENV COSIGN_VERSION=v2.2.4
 ENV CRANE_VERSION=v0.19.1
-ENV GCLOUD_VERSION=474.0.0
+ENV GCLOUD_VERSION=475.0.0
 ENV GCR_AUTH_VERSION=2.1.21
 ENV GH_VERSION=2.49.0
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
@@ -74,7 +74,7 @@ ENV PROTOC_VERSION=26.1
 ENV PROTOLOCK_VERSION=v0.17.0
 ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.3.1
-ENV TRIVY_VERSION=0.50.4
+ENV TRIVY_VERSION=0.51.1
 ENV YQ_VERSION=4.43.1
 
 ENV GO111MODULE=on
@@ -121,27 +121,27 @@ RUN dpkg -i /tmp/gh_${GH_VERSION}_linux_${TARGETARCH}.deb
 RUN mv /usr/bin/gh ${OUTDIR}/usr/bin
 
 # Build and install a bunch of Go tools
-RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION}
-RUN go install -ldflags="-s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION}
-RUN go install -ldflags="-s -w" github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
-RUN go install -ldflags="-s -w" github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION}
-RUN go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION}
-RUN go install -ldflags="-s -w" github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION}
-RUN go install -ldflags="-s -w" github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION}
-RUN go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION}
-RUN go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION}
-RUN go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION}
-RUN go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
-RUN go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
-RUN go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
-RUN go install -ldflags="-s -w" chainguard.dev/apko@${APKO_VERSION}
-RUN go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION}
-RUN go install -ldflags="-s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERSION}
-RUN go install -ldflags="-s -w" github.com/mikefarah/yq/v4@v${YQ_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" sigs.k8s.io/kind@${KIND_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" chainguard.dev/apko@${APKO_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/mikefarah/yq/v4@v${YQ_VERSION}
 # Install latest version of Istio-owned tools in this release
-RUN go install -ldflags="-s -w" \
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" \
   istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} \
@@ -153,7 +153,7 @@ RUN go install -ldflags="-s -w" \
   istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/org-gen@${ISTIO_TOOLS_SHA} \
   istio.io/tools/cmd/protoc-gen-crd@${ISTIO_TOOLS_SHA}
-RUN go install -ldflags="-s -w" \
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" \
   k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
   k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
   k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
@@ -161,11 +161,11 @@ RUN go install -ldflags="-s -w" \
   k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
   k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
   k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN go install -ldflags="-s -w" \
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" \
     sigs.k8s.io/kubetest2@${KUBETEST2_VERSION} \
     sigs.k8s.io/kubetest2/kubetest2-gke@${KUBETEST2_VERSION} \
     sigs.k8s.io/kubetest2/kubetest2-tester-exec@${KUBETEST2_VERSION}
-RUN go install -ldflags="-s -w" \
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" \
   k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION} \
   k8s.io/test-infra/prow/cmd/peribolos@${K8S_TEST_INFRA_VERSION} \
   k8s.io/test-infra/pkg/benchmarkjunit@${K8S_TEST_INFRA_VERSION}
@@ -327,7 +327,7 @@ RUN rm -fr /usr/local/go/bin/gofmt
 #############
 # Node.js
 #############
-FROM ubuntu:jammy as nodejs_tools_context
+FROM ubuntu:noble as nodejs_tools_context
 
 WORKDIR /node
 
@@ -339,7 +339,7 @@ ENV BABEL_PRESET_ENV=v7.18.2
 ENV BABEL_PRESET_MINIFY_VERSION=v0.5.2
 ENV LINKINATOR_VERSION=v2.0.5
 ENV MARKDOWN_SPELLCHECK_VERSION=v1.3.1
-ENV NODEJS_VERSION=20.12.2
+ENV NODEJS_VERSION=20.13.0
 ENV SASS_LINT_VERSION=v1.13.1
 ENV SASS_VERSION=v1.52.1
 ENV SVGO_VERSION=v1.3.2
@@ -390,13 +390,13 @@ RUN rm -rf /usr/local/share
 # Ruby
 #############
 
-FROM ubuntu:jammy as ruby_tools_context
+FROM ubuntu:noble as ruby_tools_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Pinned versions of stuff we pull in
 ENV AWESOMEBOT_VERSION=1.20.0
-ENV FPM_VERSION=v1.15.1
+ENV FPM_VERSION=1.15.1
 ENV HTMLPROOFER_VERSION=3.19.4
 ENV LICENSEE_VERSION=9.16.0
 ENV MDL_VERSION=0.12.0
@@ -417,8 +417,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ruby3.0 \
-    ruby3.0-dev
+    ruby3.2 \
+    ruby3.2-dev
 
 # Install istio.io verification tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
@@ -426,21 +426,13 @@ RUN gem install --no-wrappers --no-document nokogiri -v ${NOKOGIRI_VERSION}
 RUN gem install --no-wrappers --no-document html-proofer -v ${HTMLPROOFER_VERSION}
 RUN gem install --no-wrappers --no-document awesome_bot -v ${AWESOMEBOT_VERSION}
 RUN gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION}
-# hadolint ignore=DL3003,DL3028
-RUN mkdir fpm && \
-    cd fpm && \
-    git init && \
-    git remote add origin https://github.com/jordansissel/fpm && \
-    git fetch --depth 1 origin ${FPM_VERSION} && \
-    git checkout FETCH_HEAD && \
-    make install && \
-    cd .. && rm -rf fpm
+RUN gem install --no-wrappers --no-document fpm -v ${FPM_VERSION}
 
 ##############
 # Python
 ##############
 
-FROM ubuntu:jammy as python_context
+FROM ubuntu:noble as python_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -448,10 +440,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV AUTOPEP8_VERSION=2.0.4
 ENV PYCODESTYLE_VERSION=2.11.1
 ENV JWCRYPTO_VERSION=1.5.0
-ENV PIP_INSTALL_VERSION=23.1.2
 ENV PYGITHUB_VERSION=1.58.2
 ENV PYTHON_PROTOBUF_VERSION=4.23.2
-ENV PYYAML_VERSION=6.0
 ENV REQUESTS_VERSION=2.31.0
 ENV YAMLLINT_VERSION=1.32.0
 
@@ -462,33 +452,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc-dev \
     pkg-config \
     python3 \
-    python3-distutils \
     python3-pip \
-    python3-setuptools
+    python3-setuptools \
+    python3-yaml
 
 # Install Python stuff
-RUN python3 -m pip install --no-cache-dir --upgrade pip==${PIP_INSTALL_VERSION}
-RUN python3 -m pip install --no-cache-dir pycodestyle==${PYCODESTYLE_VERSION}
-RUN python3 -m pip install --no-cache-dir --no-binary :all: autopep8==${AUTOPEP8_VERSION}
-RUN python3 -m pip install --no-cache-dir yamllint==${YAMLLINT_VERSION}
-RUN python3 -m pip install --no-cache-dir requests==${REQUESTS_VERSION}
-RUN python3 -m pip install --no-cache-dir protobuf==${PYTHON_PROTOBUF_VERSION}
-RUN python3 -m pip install --no-cache-dir PyYAML==${PYYAML_VERSION}
-RUN python3 -m pip install --no-cache-dir jwcrypto==${JWCRYPTO_VERSION}
-RUN python3 -m pip install --no-cache-dir PyGithub==${PYGITHUB_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir pycodestyle==${PYCODESTYLE_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir --no-binary :all: autopep8==${AUTOPEP8_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir yamllint==${YAMLLINT_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir requests==${REQUESTS_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir protobuf==${PYTHON_PROTOBUF_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir jwcrypto==${JWCRYPTO_VERSION}
+RUN python3 -m pip install --break-system-packages --no-cache-dir PyGithub==${PYGITHUB_VERSION}
 
 #############
 # Base OS
 #############
 
-FROM ubuntu:jammy as base_os_context
+FROM ubuntu:noble as base_os_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 ENV CONTAINERD_VERSION=1.6.31-1
-ENV DOCKER_VERSION=5:26.1.1-1~ubuntu.22.04~jammy
-ENV DOCKER_BUILDX_VERSION=0.14.0-1~ubuntu.22.04~jammy
-ENV RUST_VERSION=1.77.2
+ENV DOCKER_VERSION=5:26.1.1-1~ubuntu.24.04~noble
+ENV DOCKER_BUILDX_VERSION=0.14.0-1~ubuntu.24.04~noble
+ENV RUST_VERSION=1.78.0
 
 ENV OUTDIR=/out
 
