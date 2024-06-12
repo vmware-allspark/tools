@@ -688,8 +688,9 @@ ENV RUBYOPT="-KU -E utf-8:utf-8"
 # Create the file system
 COPY --link --from=base_os_context / /
 COPY --link --from=binary_tools_context_base /out/ /
-COPY --link --from=go_tools_1 /tmp/go/bin/* /usr/local/go/
-COPY --link --from=go_tools_2 /tmp/go/bin/* /usr/local/go/
+COPY --link --from=binary_tools_context_base /usr/local/go /usr/local/go
+COPY --link --from=go_tools_1 /tmp/go/bin/* /usr/bin/
+COPY --link --from=go_tools_2 /tmp/go/bin/* /usr/bin/
 
 COPY --link --from=nodejs_tools_context /usr/local/bin /usr/local/bin
 COPY --link --from=nodejs_tools_context /usr/local/lib/node_modules /usr/local/lib/node_modules
@@ -887,6 +888,7 @@ ENV UBUNTU_RELEASE_VERSION=20.04
 FROM build_env_proxy_${TARGETARCH} AS build_env_proxy
 
 ENV DOCKER_BUILDX_VERSION=0.10.5-1~ubuntu.${UBUNTU_RELEASE_VERSION}~${UBUNTU_RELEASE_CODE_NAME}
+ENV SU_EXEC_VERSION=0.3.1
 
 WORKDIR /
 
@@ -995,8 +997,9 @@ RUN set -eux; \
     esac;
 
 COPY --link --from=binary_tools_context_base /out/ /
-COPY --link --from=go_tools_1 /tmp/go/bin/* /usr/local/go/
-COPY --link --from=go_tools_2 /tmp/go/bin/* /usr/local/go/
+COPY --link --from=binary_tools_context_base /usr/local/go /usr/local/go
+COPY --link --from=go_tools_1 /tmp/go/bin/* /usr/bin/
+COPY --link --from=go_tools_2 /tmp/go/bin/* /usr/bin/
 COPY --link --from=gn_context /gn/gn /usr/local/bin/gn
 COPY --link --from=bazel_context /usr/local/bin /usr/local/bin
 COPY --link --from=clang_context ${LLVM_DIRECTORY}/lib ${LLVM_DIRECTORY}/lib
@@ -1011,7 +1014,15 @@ RUN echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf
 RUN ldconfig
 
 # su-exec is used in place of complex sudo setup operations
-RUN chmod u+sx /usr/bin/su-exec
+# Build ourselves here since the one from the base has the wrong glibc version
+ADD https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz /tmp
+# hadolint ignore=DL3003
+RUN cd /tmp && \
+    tar -xzvf /tmp/v${SU_EXEC_VERSION}.tar.gz && \
+    cd /tmp/su-exec-${SU_EXEC_VERSION} && \
+    LDFLAGS="-fvisibility=hidden -Wl,-O2 -Wl,--discard-all -Wl,--strip-all -Wl,--as-needed -Wl,--gc-sections" make && \
+    cp -a su-exec /usr/bin && \
+    chmod u+sx /usr/bin/su-exec
 
 COPY bashrc /home/.bashrc
 
