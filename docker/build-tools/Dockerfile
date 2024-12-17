@@ -27,9 +27,9 @@
 ################
 # Binary tools
 ################
-ARG GOLANG_IMAGE=golang:1.23.3
+ARG GOLANG_IMAGE=golang:1.23.4
 # hadolint ignore=DL3006
-FROM ${GOLANG_IMAGE} as binary_tools_context_base
+FROM ${GOLANG_IMAGE} AS binary_tools_context_base
 # TARGETARCH is an automatic platform ARG enabled by Docker BuildKit.
 ARG TARGETARCH
 
@@ -37,26 +37,26 @@ ARG TARGETARCH
 ARG ISTIO_TOOLS_SHA
 
 # Pinned versions of stuff we pull in, keep this list sorted alphabetically
-ENV APKO_VERSION=v0.19.8
+ENV APKO_VERSION=v0.20.1
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV BOM_VERSION=v0.6.0
-ENV BUF_VERSION=v1.46.0
+ENV BUF_VERSION=v1.47.2
 ENV COSIGN_VERSION=v2.4.1
 ENV CRANE_VERSION=v0.20.2
 ENV GCLOUD_VERSION=496.0.0
 ENV GCR_AUTH_VERSION=2.1.21
-ENV GH_VERSION=2.61.0
+ENV GH_VERSION=2.63.2
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.24.0
 # When updating the golangci version, you may want to update the common-files config/.golangci* files as well.
-ENV GOLANGCI_LINT_VERSION=v1.61.0
+ENV GOLANGCI_LINT_VERSION=v1.62.2
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.5.1
-ENV GOLANG_PROTOBUF_VERSION=v1.35.1
+ENV GOLANG_PROTOBUF_VERSION=v1.35.2
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV HADOLINT_VERSION=v2.12.0
-ENV HELM3_VERSION=v3.16.2
-ENV HUGO_VERSION=0.138.0
+ENV HELM3_VERSION=v3.16.3
+ENV HUGO_VERSION=0.139.3
 ENV JB_VERSION=v0.3.1
 ENV JSONNET_VERSION=v0.20.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -65,21 +65,21 @@ ENV K8S_CODE_GENERATOR_VERSION=1.29.4
 ENV K8S_TEST_INFRA_VERSION=4f5d74517ae8ec387568f8c766f4b0ba1f454129
 # From August 18, 2024
 ENV K8S_PROW_VERSION=2b7da0bc5a15985da67cb951141ca073098660d5
-ENV KIND_VERSION=v0.24.0
+ENV KIND_VERSION=v0.25.0
 ENV KPT_VERSION=v1.0.0-beta.54
-ENV KUBECTL_VERSION=1.31.2
+ENV KUBECTL_VERSION=1.31.3
 ENV KUBECTX_VERSION=0.9.5
 ENV KUBETEST2_VERSION=b019714a389563c9a788f119f801520d059b6533
-ENV OC_VERSION=4.17.3
-ENV ORAS_VERSION=1.2.0
+ENV OC_VERSION=4.17.6
+ENV ORAS_VERSION=1.2.1
 ENV OTEL_CLI_VERSION=v0.4.1
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.16.0
-ENV PROTOC_VERSION=28.3
+ENV PROTOC_VERSION=29.1
 ENV PROTOLOCK_VERSION=v0.17.0
 ENV SHELLCHECK_VERSION=v0.10.0
 ENV SU_EXEC_VERSION=0.3.1
-ENV TRIVY_VERSION=0.57.0
-ENV YQ_VERSION=4.44.3
+ENV TRIVY_VERSION=0.58.0
+ENV YQ_VERSION=4.44.6
 
 ENV GO111MODULE=on
 ENV GOPROXY=https://proxy.golang.org
@@ -156,8 +156,8 @@ RUN set -eux; \
 RUN set -eux; \
     \
     case $(uname -m) in \
-        x86_64) HUGO_TAR=hugo_${HUGO_VERSION}_Linux-64bit.tar.gz;; \
-        aarch64) HUGO_TAR=hugo_${HUGO_VERSION}_Linux-ARM64.tar.gz;; \
+        x86_64) HUGO_TAR=hugo_extended_${HUGO_VERSION}_Linux-64bit.tar.gz;; \
+        aarch64) HUGO_TAR=hugo_extended_${HUGO_VERSION}_Linux-ARM64.tar.gz;; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
@@ -281,7 +281,7 @@ RUN rm -fr /usr/local/go/bin/gofmt
 
 # Go tools: part 1
 # We split these out to get better docker layer caching to avoid needing to pull *everything* down when just one thing changes
-FROM binary_tools_context_base as go_tools_1
+FROM binary_tools_context_base AS go_tools_1
 
 # Build and install a bunch of Go tools
 RUN --mount=type=cache,target=/tmp/go/pkg/mod \
@@ -386,7 +386,7 @@ RUN --mount=type=cache,target=/tmp/go/pkg/mod \
     CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" \
     sigs.k8s.io/prow/cmd/peribolos@${K8S_PROW_VERSION}
 
-FROM binary_tools_context_base as go_tools_2
+FROM binary_tools_context_base AS go_tools_2
 
 # Install latest version of Istio-owned tools in this release
 RUN --mount=type=cache,target=/tmp/go/pkg/mod \
@@ -408,7 +408,7 @@ RUN --mount=type=cache,target=/tmp/go/pkg/mod \
 #############
 # Node.js
 #############
-FROM ubuntu:noble as nodejs_tools_context
+FROM ubuntu:noble AS nodejs_tools_context
 
 WORKDIR /node
 
@@ -471,7 +471,7 @@ RUN rm -rf /usr/local/share
 # Ruby
 #############
 
-FROM ubuntu:noble as ruby_tools_context
+FROM ubuntu:noble AS ruby_tools_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -513,7 +513,7 @@ RUN gem install --no-wrappers --no-document fpm -v ${FPM_VERSION}
 # Python
 ##############
 
-FROM ubuntu:noble as python_context
+FROM ubuntu:noble AS python_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -550,14 +550,14 @@ RUN python3 -m pip install --break-system-packages --no-cache-dir PyGithub==${PY
 # Base OS
 #############
 
-FROM ubuntu:noble as base_os_context
+FROM ubuntu:noble AS base_os_context
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV CONTAINERD_VERSION=1.7.22-1
-ENV DOCKER_VERSION=5:27.3.1-1~ubuntu.24.04~noble
-ENV DOCKER_BUILDX_VERSION=0.17.1-1~ubuntu.24.04~noble
-ENV RUST_VERSION=1.82.0
+ENV CONTAINERD_VERSION=1.7.24-1
+ENV DOCKER_VERSION=5:27.4.0-1~ubuntu.24.04~noble
+ENV DOCKER_BUILDX_VERSION=0.19.2-1~ubuntu.24.04~noble
+ENV RUST_VERSION=1.83.0
 
 ENV OUTDIR=/out
 
@@ -628,7 +628,8 @@ ENV CARGO_HOME=/home/.cargo
 ENV RUSTUP_HOME=/home/.rustup
 # hadolint ignore=DL4006
 RUN curl --proto '=https' -v --tlsv1.2 -sSf https://sh.rustup.rs | \
-    sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal --component rustfmt clippy &&\
+    sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal \
+    --component rustfmt clippy --component llvm-tools &&\
     /home/.cargo/bin/rustup default ${RUST_VERSION} &&\
     /home/.cargo/bin/cargo install rustfilt &&\
     mv /home/.cargo/bin/* /usr/bin
@@ -657,7 +658,7 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ##############
 
 # Prepare final output image
-FROM scratch as build_tools
+FROM scratch AS build_tools
 
 # Version from build arguments
 ARG VERSION
@@ -858,7 +859,7 @@ FROM bazel_context_${TARGETARCH} AS bazel_context
 
 ARG TARGETARCH
 
-ENV BAZELISK_VERSION="v1.18.0"
+ENV BAZELISK_VERSION="v1.24.0"
 ENV BAZELISK_BASE_URL="https://github.com/bazelbuild/bazelisk/releases/download"
 ENV BAZELISK_BIN="bazelisk-linux-${TARGETARCH}"
 ENV BAZELISK_URL="${BAZELISK_BASE_URL}/${BAZELISK_VERSION}/${BAZELISK_BIN}"
